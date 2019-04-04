@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    #map { height: 600px; width:900px}
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+<br>
+<div class="container-fluid text-center">
+    <!-- Message for New Color Registration --> 
+    {% if message %}
+    <div id="collapseMessage" class="collapse show" aria-labelledby="headingMessage" > 
+        <div class="alert alert-success" role="alert">
+            <p style="font-weight:bold">"{{message}}"</p>
+            <button type="button" class="btn btn-secondary collapsed" data-toggle="collapse" data-target="#collapseMessage">Close</button>
+        </div>
+        <br>  
+    </div>
+    {% endif %}
+    
+    <div class="row content">
+        <!-- Title -->
+        <div class="col-sm-8 text-left"> 
+            <h3>Color Information</h3>
+        </div>   
+        <!-- Setting of Link Button -->
+        <div class="col-sm-2" style="text-align:right">
+            <p></p>
+            <p></p>
+        </div>
+        <div class="col-sm-2" style="text-align:right">
+            <p><a class="btn btn-info btn-sm border-light" style="background-color:deeppink; width:110pt"
+                href="{% url 'litmus:main' %}">Color Search</a></p>
+            <p></p>
+        </div>
+    </div>
+</div>
+<br>
+<div class="container">
+    <div class="row content">
+        <div class="col-sm-4 "> 
+            <div class="card" style="width: 16rem; height: 15rem;">
+                <div class="card-body" style="background-color:{{litmus.hexa}}">           
+                    {% if litmus.depth == "dark" %}
+                    <h5 class="card-title" style="color:white">{{litmus.name}}</h5>
+                    <h6 style="color:white">{{litmus.hexa}}</h6>  
+                    {% else %}
+                    <h5 class="card-title" style="color:black; font-weight: bold">{{litmus.name}}</h5>
+                    <h6 style="color:black">{{litmus.hexa}}</h6> 
+                    {% endif %}                  
+                </div> 
+            </div>
+            <br>
+            <div class="container">
+                <table class="table-condensed" style="font-size:small; font-weight:bold">
+                    <tr><td>Color Group &ensp;</td>
+                        <td>{{litmus.group}}</td></tr>
+                    <tr><td>Color Depth &ensp;</td>
+                        <td>{{litmus.depth}}</td></tr>
+                </table>
+                <br>
+            </div> 
+        </div>
+        <div class="col-sm-8 text-left"> 
+            <h5>Color Coordinates</h5>
+            <hr>
+            <table class="table-condensed" style="font-size:small; ">
+                <tr><td>RGB</td>
+                    <td>RGB</td>
+                    <td>R {{vector.RGB.RGB.R}}&ensp; G {{vector.RGB.RGB.G}}&ensp; B {{vector.RGB.RGB.B}}</td></tr>
+                <tr><td></td>
+                    <td>rgb </td>
+                    <td>r {{vector.RGB.rgb.r|floatformat:4}}&ensp; g {{vector.RGB.rgb.g|floatformat:4}}&ensp; b {{vector.RGB.rgb.b|floatformat:4}}</td></tr> 
+                <tr><td></td>
+                    <td>HSL </td>
+                    <td>H {{vector.RGB.HSL.H|floatformat:2}}&ensp; S {{vector.RGB.HSL.S|floatformat:4}}&ensp; L {{vector.RGB.HSL.L|floatformat:4}}&ensp; C {{vector.RGB.HSL.C|floatformat:4}}</td></tr>  
+                <tr><td></td>    
+                    <td>Parameter &ensp;</td>
+                    <td>Sum {{vector.RGB.Param.Sum|floatformat:4}}&ensp; Max {{vector.RGB.Param.Max|floatformat:4}}&ensp; Min {{vector.RGB.Param.Min|floatformat:4}}&ensp; Sigma {{vector.RGB.Param.Sigma|floatformat:4}}&ensp; Delta {{vector.RGB.Param.Delta|floatformat:4}}</td></tr> 
+                <tr><td></td>
+                    <td>Geo </td>
+                    <td>Latitude {{vector.RGB.GEO.Lati|floatformat:2}}&ensp; Longitude {{vector.RGB.GEO.Long|floatformat:2}}&ensp; Radius {{vector.RGB.GEO.Radius|floatformat:4}}</td></tr> 
+                <tr><td>HSLV </td> 
+                    <td>HSL</td>
+                    <td>H {{vector.HSLV.HSL.H|floatformat:2}}&ensp; S {{vector.HSLV.HSL.S|floatformat:4}}&ensp; L {{vector.HSLV.HSL.L|floatformat:4}}&ensp; C {{vector.HSLV.HSL.C|floatformat:4}}</td></tr>
+                <tr><td></td>
+                    <td>HSV</td>
+                    <td>H {{vector.HSLV.HSV.H|floatformat:2}}&ensp; S {{vector.HSLV.HSV.S|floatformat:4}}&ensp; V {{vector.HSLV.HSV.V|floatformat:4}}&ensp; C {{vector.HSLV.HSV.C|floatformat:4}}</td></tr>
+                <tr><td>CMYK &ensp; </td>
+                    <td>CMYK</td>
+                    <td>K {{vector.CMYK.K|floatformat:4}}&ensp; C {{vector.CMYK.C|floatformat:4}}&ensp; M {{vector.CMYK.M|floatformat:4}}&ensp; Y {{vector.CMYK.Y|floatformat:4}}</td></tr>
+                {% for key, value in vector.XYZ.items %}
+                <tr><td>{% if forloop.counter == 1 %}XYZ {% endif %}</td>
+                    <td>{{key}}&deg; &ensp; </td>
+                    <td>X {{value.X|floatformat:4}}&ensp; Y {{value.Y|floatformat:4}}&ensp; Z {{value.Z|floatformat:4}}&ensp; 
+                        x {{value.x|floatformat:4}}&ensp; y {{value.y|floatformat:4}}&ensp; I {{value.I|floatformat:4}}</td></tr>
+                {% endfor %}
+                {% for key, value in vector.Labuv.items %}
+                <tr><td>{% if forloop.counter == 1 %}Lab {% endif %}</td>
+                    <td>{{key}}&deg; &ensp; </td>
+                    <td>L {{value.Lab.L|floatformat:4}}&ensp; a* {{value.Lab.a|floatformat:4}}&ensp; b* {{value.Lab.b|floatformat:4}}&ensp; 
+                        H {{value.Lab.H|floatformat:2}}&ensp; C {{value.Lab.C|floatformat:4}}&ensp; S {{value.Lab.S|floatformat:4}}</td></tr>
+                {% endfor %}
+                {% for key, value in vector.Labuv.items %}
+                <tr><td>{% if forloop.counter == 1 %}Luv {% endif %}</td>
+                    <td>{{key}}&deg; &ensp; </td>
+                    <td>L {{value.Luv.L|floatformat:4}}&ensp; u* {{value.Luv.u|floatformat:4}}&ensp; v* {{value.Luv.v|floatformat:4}}&ensp; 
+                        H {{value.Luv.H|floatformat:2}}&ensp; C {{value.Luv.C|floatformat:4}}&ensp; S {{value.Luv.S|floatformat:4}}</td></tr>
+                {% endfor %}
+                {% for key, value in vector.Labuv.items %}
+                <tr><td>{% if forloop.counter == 1 %}GeoLab {% endif %}</td>
+                    <td>{{key}}&deg; &ensp; </td>
+                    <td>Latitude {{value.GeoLab.Lati|floatformat:2}}&ensp; Longitude {{value.GeoLab.Long|floatformat:2}}&ensp; Radius {{value.GeoLab.Radius|floatformat:4}}</td></tr> 
+                {% endfor %}
+                {% for key, value in vector.Labuv.items %}
+                <tr><td>{% if forloop.counter == 1 %}GeoLuv {% endif %}</td>
+                    <td>{{key}}&deg; &ensp; </td>
+                    <td>Latitude {{value.GeoLuv.Lati|floatformat:2}}&ensp; Longitude {{value.GeoLuv.Long|floatformat:2}}&ensp; Radius {{value.GeoLuv.Radius|floatformat:4}}</td></tr> 
+                {% endfor %}
+            </table>
+            <br>
+        </div>
+    </div>
+</div>
+<div class="container">
+    {% if search.identicals.count > 1 %}
+        <br>
+        <h5>Colors Identical to "{{word}}" <span class="badge badge-warning" style="font-size:12pt; text-align:center">{{search.identicals.count}}</span></h5>
+        <hr>
+        {% for item in search.identicals.list %}
+        <div style="display: inline-block;">
+            {% if item.litmus.depth == "dark" %}
+                <p><a class="btn btn-primary btn-block border-light"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:white; background-color:{{item.litmus.hexa}};"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':17' }}
+                </a></p>
+            {% else %}
+                <p><a class="btn btn-default btn-block border-light font-weight-bold"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:black; background-color:{{item.litmus.hexa}}"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':17' }}
+                </a></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <br><br>
+    {% endif %}
+    {% if search.neighbors.count %}
+        <br>
+        <h5>Colors Neighbor to "{{word}}" <span class="badge badge-warning" style="font-size:12pt; text-align:center">{{search.neighbors.count}}</span></h5>
+        <hr>
+        {% for item in search.neighbors.list %}
+        <div style="display: inline-block;">
+            {% if item.litmus.depth == "dark" %}
+                <p><a class="btn btn-primary btn-block border-light"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:white; background-color:{{item.litmus.hexa}};"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':15' }}<br>d={{item.distance|floatformat:4}}
+                </a></p>
+            {% else %}
+                <p><a class="btn btn-default btn-block border-light font-weight-bold"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:black; background-color:{{item.litmus.hexa}}"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':15' }}<br>d={{item.distance|floatformat:4}}
+                </a></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <br><br>
+    {% endif %}
+    {% if search.neighbors.count %}
+        <br>
+        <h5>Plot in RGB Space</h5>
+        <hr>
+        <div>{{plot|safe}}</div>
+        <br>
+    {% endif %}
+    <br>
+    <h5>Geo Map</h5>
+    <hr>
+    <div id="map"></div>
+</div>  
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCr7uqzPRQYrFASLrIVkMbK8yCk6vbavtQ&callback=initMap"
+></script>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function () {
+        $('#color_picker').colorpicker({
+            format: 'hex',
+        });
+        $('#color_picker').colorpicker().on('changeColor', function(e) {
+            document.getElementById("search_input").value = e.color.toHex().toUpperCase();
+        });
+    });
+</script>
+<script>
+    var map;
+    function initMap() {
+        var map_center = {lat: 34, lng: 130}; 
+        var map = new google.maps.Map(document.getElementById('map'), {zoom: 1.6, center: map_center});
+        // var marker = new google.maps.Marker({position: map_center, map: map, title:"title"});
+        
+        var locations = [
+            {% if search.identicals.count %}
+            {% for item in search.identicals.list %}
+                ["{{item.id}}",{{item.litmus.geo.0}}, {{item.litmus.geo.1}}, "{{item.litmus.name}}", "{{item.litmus.hexa}}", "identicals"],
+                // [{{item.name}}, "<a href={% url 'litmus:colorInfo' pk=item.id %}</a>", {{item.geo.lati}}, {{item.geo.long}}],
+            {% endfor%}
+            {% endif %}
+            {% if search.neighbors.count %}
+            {% for item in search.neighbors.list %}
+                ["{{item.id}}",{{item.litmus.geo.0}}, {{item.litmus.geo.1}}, "{{item.litmus.name}}", "{{item.litmus.hexa}}", "neighbors"],
+                // [{{item.name}}, "<a href={% url 'litmus:colorInfo' pk=item.id %}</a>", {{item.geo.lati}}, {{item.geo.long}}],
+            {% endfor%}
+            {% endif %}
+            {% if search.matches.count %}
+            {% for item in search.matches.list %}
+                ["{{item.id}}",{{item.litmus.geo.0}}, {{item.litmus.geo.1}}, "{{item.litmus.name}}", "{{item.litmus.hexa}}", "matches"],
+                // [{{item.name}}, "<a href={% url 'litmus:colorInfo' pk=item.id %}</a>", {{item.geo.lati}}, {{item.geo.long}}],
+            {% endfor%}
+            {% endif %}
+        ]
+        for (var i = 0; i < locations.length; i++) {
+            var marker = new google.maps.Marker({ 
+                position: {lat: locations[i][1], lng: locations[i][2]}, 
+                map: map,
+                label: {
+                    color: 'black',
+                    fontWeight: 'bold',
+                    fontSize: '11px',
+                    text: locations[i][3]
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale : 6,
+                    strokeWeight : 2,
+                    fillColor: locations[i][4],
+                    fillOpacity: 1.0,
+                    strokeColor: 'gray',
+                    anchor: new google.maps.Point(0, 0),
+                    labelOrigin: new google.maps.Point(0, 2)
+                },
+            }); 
+        }
+    }
+</script>
+
+{% endblock %}

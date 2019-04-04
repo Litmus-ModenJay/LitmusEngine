@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+    #map { height: 600px; width:900px}
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<br>
+<div class="container-fluid text-center">
+    <div class="row content">
+        <!-- Title -->
+        <div class="col-sm-8 text-left"> 
+            <h3>Color Search</h3>
+            <p></p>
+            <br>
+        </div>
+        <!-- Setting of Link Button -->
+        <div class="col-sm-2" style="text-align:right">
+            <p></p>        
+        </div>
+        <div class="col-sm-2" style="text-align:right">
+            <p><a class="btn btn-info btn-sm" style="background-color:royalblue; width:110pt" 
+                href="{% url 'litmus:colorLibrary' %}">Color Library</a></p>
+            <p></p>
+            <p></p>
+        </div>
+    </div>
+    <!-- Search -->
+    <div class="container center-block text-center" style="text-align:center; padding:10px">
+        <form class="form-inline" style="text-align:center" action="{% url 'litmus:colorSearch' %}" id="color_search" method="POST">
+            {% csrf_token %}
+            <div class="form-group" style="text-align:center">
+                <button class="input-group-addon btn btn-Warning" id="color_picker"><i class="fas fa-palette color:green"></i></button>
+                <input type="text"  name="search" id="search_input" class="form-control input-group colorpicker-component" style="text-align:left" placeholder="color name or code">
+                <button type="submit" onkeydown="enterkey();" name="submit" class="btn btn-Warning"><i class="fas fa-search"></i></button>   
+            </div>
+        </form>
+        <br><br>
+    </div>
+</div>
+
+<div class="container">
+    {% if search.identicals.count %}
+        <br>
+        <h5>Colors Identical to "{{word}}" <span class="badge badge-warning" style="font-size:12pt; text-align:center">{{search.identicals.count}}</span></h5>
+        <hr>
+        {% for item in search.identicals.list %}
+        <div style="display: inline-block;">
+            {% if item.litmus.depth == "dark" %}
+                <p><a class="btn btn-primary btn-block border-light"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:white; background-color:{{item.litmus.hexa}};"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':17' }}
+                </a></p>
+            {% else %}
+                <p><a class="btn btn-default btn-block border-light font-weight-bold"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:black; background-color:{{item.litmus.hexa}}"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':17' }}
+                </a></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <br><br>
+    {% endif %}
+
+    {% if search.neighbors.count %}
+        <br>
+        <h5>Colors Neighbor to "{{word}}" <span class="badge badge-warning" style="font-size:12pt; text-align:center">{{search.neighbors.count}}</span></h5>
+        <hr>
+        {% for item in search.neighbors.list %}
+        <div style="display: inline-block;">
+            {% if item.litmus.depth == "dark" %}
+                <p><a class="btn btn-primary btn-block border-light"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:white; background-color:{{item.litmus.hexa}};"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':15' }}<br>d={{item.distance|floatformat:4}}
+                </a></p>
+            {% else %}
+                <p><a class="btn btn-default btn-block border-light font-weight-bold"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:black; background-color:{{item.litmus.hexa}}"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':15' }}<br>d={{item.distance|floatformat:4}}
+                </a></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <br><br>
+    {% endif %}
+    
+    {% if search.matches.count %}
+        <br>
+        <h5>Colors including word "{{word}}" <span class="badge badge-warning" style="font-size:12pt; text-align:center">{{search.matches.count}}</span></h5>
+        <hr>
+        {% for item in search.matches.list %}
+        <div style="display: inline-block;">
+            {% if item.litmus.depth == "dark" %}
+                <p><a class="btn btn-primary btn-block border-light"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:white; background-color:{{item.litmus.hexa}};"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':15' }}
+                </a></p>
+            {% else %}
+                <p><a class="btn btn-default btn-block border-light font-weight-bold"
+                    style="width: 100px; height: 100px; font-size:8pt; text-align:left; padding:5px; color:black; background-color:{{item.litmus.hexa}}"
+                    href="{% url 'litmus:colorInfo' pk=item.id %}">
+                    {{ item.litmus.name|slice:':15' }}
+                </a></p>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <br><br>
+    {% endif %}
+    {% if word %}
+    <br><br>
+    <h5>Plot in RGB Space</h5>
+    <hr>
+    <div class="container-fluid text-center" >{{plot|safe}}</div>
+    {% endif %}
+
+    <br>
+    <h5>Geo Map</h5>
+    <hr>
+    <div id="map"></div>
+</div>  
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCr7uqzPRQYrFASLrIVkMbK8yCk6vbavtQ&callback=initMap"
+></script>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(function () {
+        $('#color_picker').colorpicker({
+            format: 'hex',
+        });
+        $('#color_picker').colorpicker().on('changeColor', function(e) {
+            document.getElementById("search_input").value = e.color.toHex().toUpperCase();
+
+        });
+    });
+</script>
+<script>
+    var map;
+    function initMap() {
+        var map_center = {lat: 34, lng: 130}; 
+        var map = new google.maps.Map(document.getElementById('map'), {zoom: 1.6, center: map_center});
+        // var marker = new google.maps.Marker({position: map_center, map: map, title:"title"});
+        
+        var locations = [
+            {% if search.identicals.count %}
+            {% for item in search.identicals.list %}
+                ["{{item.id}}",{{item.litmus.geo.0}}, {{item.litmus.geo.1}}, "{{item.litmus.name}}", "{{item.litmus.hexa}}", "identicals"],
+                // [{{item.name}}, "<a href={% url 'litmus:colorInfo' pk=item.id %}</a>", {{item.geo.lati}}, {{item.geo.long}}],
+            {% endfor%}
+            {% endif %}
+            {% if search.neighbors.count %}
+            {% for item in search.neighbors.list %}
+                ["{{item.id}}",{{item.litmus.geo.0}}, {{item.litmus.geo.1}}, "{{item.litmus.name}}", "{{item.litmus.hexa}}", "neighbors"],
+                // [{{item.name}}, "<a href={% url 'litmus:colorInfo' pk=item.id %}</a>", {{item.geo.lati}}, {{item.geo.long}}],
+            {% endfor%}
+            {% endif %}
+            {% if search.matches.count %}
+            {% for item in search.matches.list %}
+                ["{{item.id}}",{{item.litmus.geo.0}}, {{item.litmus.geo.1}}, "{{item.litmus.name}}", "{{item.litmus.hexa}}", "matches"],
+                // [{{item.name}}, "<a href={% url 'litmus:colorInfo' pk=item.id %}</a>", {{item.geo.lati}}, {{item.geo.long}}],
+            {% endfor%}
+            {% endif %}
+        ]
+        for (var i = 0; i < locations.length; i++) {
+            var marker = new google.maps.Marker({ 
+                position: {lat: locations[i][1], lng: locations[i][2]}, 
+                map: map,
+                label: {
+                    color: 'black',
+                    fontWeight: 'bold',
+                    fontSize: '11px',
+                    text: locations[i][3]
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale : 6,
+                    strokeWeight : 2,
+                    fillColor: locations[i][4],
+                    fillOpacity: 1.0,
+                    strokeColor: 'gray',
+                    // anchor: new google.maps.Point(0, 0),
+                    labelOrigin: new google.maps.Point(0, 2)
+                },
+            }); 
+        }
+    }
+</script>
+{% endblock %}
