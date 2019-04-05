@@ -17,6 +17,9 @@ env-litmus/
 ### VScode ###
 .vscode/
 
+### Static ###
+static/
+
 ### Confidential ###
 /zeroth/sectret.json
 /litmus/litmus.json
