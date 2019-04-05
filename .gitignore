@@ -7,10 +7,20 @@ db.sqlite3
 .DS_Store
 local_settings.py
 media
+
 ### Environments ###
 env/
+.env/
+.env-litmus/
+env-litmus/
+
 ### VScode ###
 .vscode/
+
+### Confidential ###
+/zeroth/sectret.json
+/litmus/litmus.json
+
 ### Distribution / Packaging ###
 .Python
 build/ 
