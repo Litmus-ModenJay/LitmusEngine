@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^colorLibrary$', views.colorLibrary, name='colorLibrary'),
     url(r'^msLogin$', views.msLogin, name='msLogin'),
     url(r'^msLogout$', views.msLogout, name='msLogout'),
+    url(r'^msAuth$', views.msAuth, name='msAuth'),
 ]

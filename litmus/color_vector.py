@@ -12,10 +12,12 @@ class ColorVector():
         self.CMYK =  self.get_CMYK()
         self.XYZ =  self.get_XYZ()
         self.Labuv =  self.get_Labuv()
-        self.group = self.get_group('rgb')
-        self.depth = self.get_depth('rgb')
-        self.all = {'hexa':self.hexa, 'rgb':self.rgb, 'RGB': self.RGB, 'HSLV': self.HSLV, 'CMYK': self.CMYK, 
-                    'XYZ':self.XYZ, 'Labuv':self.Labuv, 'group':self.group, 'depth':self.depth}
+        # self.proximity = self.get_proximity('rgb')
+        # self.group = self.get_group('rgb')
+        # self.depth = self.get_depth('rgb')
+        self.all = {'hexa':self.hexa, 'rgb':self.rgb, 'RGB': self.RGB, 
+                    'HSLV': self.HSLV, 'CMYK': self.CMYK, 
+                    'XYZ':self.XYZ, 'Labuv':self.Labuv}
         
     def get_RGB(self):
         # from hexa to RGB & rgb
@@ -67,16 +69,6 @@ class ColorVector():
                 GeoLab = {"Lati": geo[0], "Long": geo[1], "Radius": geo[2]}
                 Labuv.update({title: {'Lab': Lab, 'Luv': Luv, 'GeoLuv': GeoLuv, 'GeoLab': GeoLab}})
         return Labuv
-
-    def get_group(self, method) :
-        if method == 'rgb' :
-            group = CVC.rgb_group(self.rgb)
-        return group 
-
-    def get_depth(self, method) :
-        if method == 'rgb' :
-            depth = CVC.rgb_depth(self.rgb)
-        return depth
-
+        
 
 

@@ -1,4 +1,5 @@
-﻿20190404 Google App Engine 배포용으로 정리 
+20190411 Login 변경 (메인에서 로그인), rob -> XYZ linearize 적용, Google App Engine 배포
+20190404 Google App Engine 배포용으로 정리 
 20190328 Geo Map 기능 구현
 20190326 MSlogin 기능 구현, 컬러 버튼 리스트 방법 변경
 20190322 Litmus Project v0.2 시작

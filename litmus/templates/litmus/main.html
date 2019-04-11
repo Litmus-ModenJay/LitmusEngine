@@ -2,36 +2,21 @@
 
 {% load static %}
 
-{% block head %}
-<style>
-    #map { height: 425px; }
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        }
-</style>
-{% endblock %}
-
 {% block content %}
 
 <div class="container-fluid text-center" style="text-align:center; padding:100px">
     <!-- Title -->
     <img src="{% static 'icon/Color Studio-Litmus Project(title)-20190404.jpg' %}" style="width: 38%; height: auto;" alt="Search Colors"/>
 
-    <!-- Search with Color Picker-->
+    <!-- Login Button-->
     <br><br><br><br>
-    <form class="form-inline justify-content-center"  action="{% url 'litmus:colorSearch' %}" id="color_search" method="POST">
-        {% csrf_token %}
-        <div class="form-group" >
-            <button class="input-group-addon btn btn-Warning" id="color_picker"><i class="fas fa-palette color:green"></i></button>
-            <input type="text"  name="search" id="search_input" class="form-control input-group colorpicker-component" style="text-align:left" placeholder="color name or code">
-            <button type="submit" onkeydown="enterkey();" name="submit" class="btn btn-Warning"><i class="fas fa-search"></i></button>   
-        </div>
-    </form>
+    <div style="text-align:center">
+        <p><a class="btn btn-info btn-sm" style="background-color:royalblue; width:110pt" 
+            href="{% url 'litmus:msAuth' %}">Login</a></p>
+    </div>
 </div>
 
-<div class="container-fluid text-center" style="text-align:center; padding:50px">
+<div class="container-fluid text-center" style="text-align:center; padding:30px">
 </div>
 
 {% endblock %}
