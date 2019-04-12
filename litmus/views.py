@@ -7,7 +7,7 @@ import os
 import json
 import math
 from .litmus_database import Litmus
-from .litmus_search import is_hexa, search_by_hexa, search_by_name
+from .litmus_search import search_main, search_info
 from .color_vector import ColorVector
 from .litmus_plot import plot_RGB
 from .ms_login import MSlogin
@@ -15,7 +15,12 @@ from .ms_auth import url_sign_in, url_sign_out, get_token_from_code, get_access_
 from .ms_graph import get_me 
 
 def litmus(request):
-    # 메인 페이지 처음 렌더 시 로그인 redirect 변수를 제공해야 함.
+    return redirect('litmus:main')
+
+def main(request):
+    return render(request, 'litmus/main.html')
+
+def msAuth(request):
     uri_in = request.build_absolute_uri(reverse('litmus:msLogin'))
     uri_out = request.build_absolute_uri(reverse('litmus:msLogout'))
     sign_in = url_sign_in(uri_in)
@@ -23,44 +28,18 @@ def litmus(request):
     MSlogin.redirect = {'login':uri_in, 'logout': uri_out}
     MSlogin.urls = {'login':sign_in, 'logout': sign_out}
     return redirect(sign_in)
-    #return redirect('litmus:main')
-
-def main(request):
-    
-    if request.method == "POST":
-        word = request.POST['search']
-        if len(word):
-            hexa = is_hexa(word)
-            if hexa:
-                search = search_by_hexa(hexa, radius=0.1)
-            else:
-                search = search_by_name(word)
-            plot = plot_RGB(search)
-            check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
-            # geo_key = '{0}{1}{2}'.format('https://maps.googleapis.com/maps/api/js?key=', GOOGLE_MAPS_API_KEY_LITMUS, '&callback=initMap')
-            context = {'login':check_login, 'word':word, 'search':search, 'plot':plot}
-            return render(request, 'litmus/color_search.html', context)
-    
-    check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
-    context = {'count':check_login['status'], 'login':check_login}
-    return render(request, 'litmus/main.html', context)
 
 def colorSearch(request):
-    search = {}
-    plot = {}
-    word = ""
     if request.method == "POST":
         word = request.POST['search']
-        if len(word):
-            hexa = is_hexa(word)
-            if hexa:
-                search = search_by_hexa(hexa, radius=0.1)
-            else:
-                search = search_by_name(word)
+        search = search_main(word)
+        if search:
             plot = plot_RGB(search)
+            check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+            context = {'login':check_login, 'word':word, 'search':search, 'plot':plot}
+            return render(request, 'litmus/color_search.html', context)
     check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
-    test = ["aaa", "bbb"]
-    context = {'login':check_login, 'word':word, 'search':search, 'plot':plot, 'test':test}
+    context = {'count':check_login['status'], 'login':check_login}
     return render(request, 'litmus/color_search.html', context)
 
 def colorInfo(request, pk): 
@@ -68,7 +47,7 @@ def colorInfo(request, pk):
     litmus = Litmus.get_by_id(color_id)
     hexa = litmus['hexa']
     vector = ColorVector(hexa).all
-    search = search_by_hexa(hexa, radius=0.1)
+    search = search_info(color_id, hexa)
     plot = plot_RGB(search)
     message = ""
     check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
@@ -86,7 +65,7 @@ def msLogin(request):
     code = request.GET['code']
     user_id = MSlogin.sign_in(code)
     # Set Cookie
-    response = HttpResponseRedirect('/litmus/main')
+    response = HttpResponseRedirect('/litmus/colorSearch')
     response.set_cookie('id', user_id)
     return response
     
