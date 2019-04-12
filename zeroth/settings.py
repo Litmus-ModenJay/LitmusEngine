@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '5a%uxnh$cwg9=+bc592lu-8%tm+61pv7kn5raq=r7=2x=f4!-0'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com', 'litmusproject-1553669516964.appspot.com']
 
@@ -126,7 +126,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
+# STATIC_ROOT = 'static'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),

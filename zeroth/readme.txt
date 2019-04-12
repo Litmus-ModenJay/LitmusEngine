@@ -1,3 +1,4 @@
+20190412 임시 로그인 적용 배포
 20190411 Login 변경 (메인에서 로그인), rob -> XYZ linearize 적용, Google App Engine 배포
 20190404 Google App Engine 배포용으로 정리 
 20190328 Geo Map 기능 구현

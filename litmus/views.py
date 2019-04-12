@@ -18,6 +18,11 @@ def litmus(request):
     return redirect('litmus:main')
 
 def main(request):
+    if request.method == "POST":
+        word = request.POST['login']
+        if word == "K3000K3000":
+            return render(request, 'litmus/color_search.html')
+    
     return render(request, 'litmus/main.html')
 
 def msAuth(request):
@@ -35,12 +40,14 @@ def colorSearch(request):
         search = search_main(word)
         if search:
             plot = plot_RGB(search)
-            check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+            # check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+            check_login = {}
             context = {'login':check_login, 'word':word, 'search':search, 'plot':plot}
             return render(request, 'litmus/color_search.html', context)
-    check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
-    context = {'count':check_login['status'], 'login':check_login}
-    return render(request, 'litmus/color_search.html', context)
+    # check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+    check_login = {}
+    context = {'login':check_login}
+    return render(request, 'litmus/color_search.html', context) 
 
 def colorInfo(request, pk): 
     color_id = int(pk)
@@ -50,14 +57,16 @@ def colorInfo(request, pk):
     search = search_info(color_id, hexa)
     plot = plot_RGB(search)
     message = ""
-    check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+    # check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+    check_login = {}
     context = {'login':check_login, 'message':message, 'litmus':litmus, 'vector':vector, 'search':search, 'plot':plot}
     return render(request, 'litmus/color_info.html', context)
 
 def colorLibrary(request):
     db = Litmus.classify_by_group('name', 'ascend')
     total = Litmus.count()
-    check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+    # check_login = MSlogin.check(user_id=request.COOKIES.get('id'))
+    check_login = {}
     context = {'login':check_login, 'colors':db, 'total':total}
     return render(request, 'litmus/color_library.html', context)
     
