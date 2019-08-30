@@ -2,37 +2,41 @@ from .litmus_database import Litmus
 from .color_space import CVC
 
 def search_main(word):
-    if len(word) < 3: # 2글자 이하는 검색에서 제외
-        return {}
     search = {}
-    if word[0] == '#':
+    if len(word) > 2: # 2글자 이하는 검색에서 제외
+        symbol = word[0]
         tag = word[1:]
-        hexa = is_hexa(tag) # 헥사코드인지 확인 - #시작 16진 7 숫자 (#FFFFFF) or 16진 6 숫자 (FFFFFF)
-        if hexa: 
-            search = search_by_hexa(hexa, radius=0.1)
-        else:
-            category = is_tag(tag) # 키워드인지 확인 - #Family or #Keyword
-            if category == 'family':
+        if symbol == '#':
+            if is_hexa(tag): # 헥사코드인지 확인 - #시작 16진 7 숫자 (#FFFFFF) or 16진 6 숫자 (FFFFFF)
+                search = search_by_hexa(word, radius=0.1)
+        elif symbol == '/':
+            if tag in Litmus.family.keys():
                 search = search_by_family(tag)
-            elif category == 'keyword':
-                search = serch_by_keyword(tag)
-    elif word[0] == '@':
-        geo = is_geo(word[1:])
-        if geo:
-            search = search_by_geo(geo, radius = 10)
-    else:
-        search = search_by_name(word)
-    if search:
-        # 디폴트 리스트를 검색 결과에 추가 (supernova & giant)
-        search.update({'supernova':{'count':len(Litmus.supernova), 'list':Litmus.supernova}})
-        # search.update({'giant':{'count':len(Litmus.giant), 'list':Litmus.giant}})
+        elif symbol == '$':
+            if tag in Litmus.cell.keys():
+                search = search_by_cell(tag)
+        elif symbol == '@':
+            geo = is_geo(tag)
+            if geo :
+                search = search_by_geo(geo, radius = 10)
+        else:
+            search = search_by_name(word)
+        if search:
+            search.update({'supernova':{'count':len(Litmus.supernova), 'list':Litmus.supernova}})
     return search
 
-def search_info(my_id, hexa):
+def search_info(my_id):
+    litmus = Litmus.db[my_id]
+    hexa = litmus['hexa']
+    family = litmus['family']['name']
+    cell = litmus['cell']['room']
     search = search_by_hexa(hexa, radius=0.1)
     for item in search['identical']['list']:
         if my_id == item['id']:
             item['case'] = 'self'
+    search.update(search_by_family(family))
+    search.update(search_by_cell(cell))
+    search.update(get_thesaurus(my_id))
     search.update({'supernova':{'count':len(Litmus.supernova), 'list':Litmus.supernova}})
     return search
 
@@ -70,16 +74,26 @@ def search_by_name(word):
 
 def search_by_family(tag): 
     family = []
-    for litmus in Litmus.db:
-        for item in litmus['family']:
-            if tag == item:
-                family.append({'id': litmus['id'], 'case':'family', 'litmus':litmus})
+    for index in Litmus.family[tag]['list']:
+        litmus = Litmus.db[int(index)]
+        family.append({'id': litmus['id'], 'case':'family', 'litmus':litmus})
     if family:
         sorted_f = sorted(family, key=lambda f: f['litmus']['name'])
         return {'family':{'count':len(sorted_f), 'list':sorted_f}}
     else:
         return {}
 
+def search_by_cell(tag): 
+    cell = []
+    for index in Litmus.cell[tag]['list']:
+        litmus = Litmus.db[int(index)]
+        cell.append({'id': litmus['id'], 'case':'cell', 'litmus':litmus})
+    if cell:
+        sorted_c = sorted(cell, key=lambda c: c['litmus']['name'])
+        return {'cell':{'count':len(sorted_c), 'list':sorted_c}}
+    else:
+        return {}
+  
 def search_by_geo(geo, radius):
     identical = []
     neighbor = []
@@ -99,6 +113,96 @@ def search_by_geo(geo, radius):
     else:
         return {}
 
+def get_thesaurus(litmus_id) :
+    thesaurus = {}
+    litmus = Litmus.db[litmus_id]
+    rgb = litmus['rgb']
+    room = litmus['cell']['room']
+    r, g, b = room[0:1], room[1:2], room[2:3]
+    level = int( (int(r) + int(g) + int(b)) / 2 )
+    
+    complementary = []
+    additive = (1-rgb[0], 1-rgb[1], 1-rgb[2])
+    new_id = find_nearest(additive, 0.1)
+    new_litmus = Litmus.db[new_id]
+    complementary.append({'id': new_id, 'case':'complementary', 'litmus':new_litmus })
+    CMYK = CVC.rgb_CMYK(rgb)
+    subtractive = ( CMYK[0]*(1-CMYK[3]), CMYK[1]*(1-CMYK[3]), CMYK[2]*(1-CMYK[3]) )
+    new_id = find_nearest(subtractive, 0.1)
+    new_litmus = Litmus.db[new_id]
+    complementary.append({'id': new_id, 'case':'complementary', 'litmus':new_litmus })
+    thesaurus.update({'complementary':{'count':len(complementary), 'list':complementary}})
+
+    shade = []
+    if level > 2 :
+        for i in range (1, level-1) :
+            new_rgb = ( rgb[0]*i/level, rgb[1]*i/level, rgb[2]*i/level )
+            new_id = find_nearest(new_rgb, 0.1)
+            new_litmus = Litmus.db[new_id]
+            shade.append({'id': new_id, 'case':'shade', 'litmus':new_litmus })
+    if shade :
+        thesaurus.update({'shade':{'count':len(shade), 'list':shade}})
+
+    tint = []
+    if level < 7 :
+        for i in range (1, 12 - level) :
+            new_rgb = ( 1-(1-rgb[0])*i/(12-level), 1-(1-rgb[1])*i/(12-level), 1-(1-rgb[2])*i/(12-level) )
+            new_id = find_nearest(new_rgb, 0.1)
+            new_litmus = Litmus.db[int(new_id)]
+            tint.append({'id': new_id, 'case':'tint', 'litmus':new_litmus })
+    if tint :
+        thesaurus.update({'tint':{'count':len(tint), 'list':tint}})
+
+    adjacent = []
+    if int(r) > 1 :
+        cell = str(int(r)-1) + g + b
+        new_id = Litmus.cell[cell]['owner']['id']
+        new_litmus = Litmus.db[new_id]
+        adjacent.append({'id': new_id, 'case':'adjavent', 'litmus':new_litmus })
+    if int(r) < 8 :
+        cell = str(int(r)+1) + g + b
+        new_id = Litmus.cell[cell]['owner']['id']
+        new_litmus = Litmus.db[new_id]
+        adjacent.append({'id': new_id, 'case':'adjavent', 'litmus':new_litmus })
+    if int(g) > 1 :
+        cell = r + str(int(g)-1) + b
+        new_id = Litmus.cell[cell]['owner']['id']
+        new_litmus = Litmus.db[new_id]
+        adjacent.append({'id': new_id, 'case':'adjavent', 'litmus':new_litmus })
+    if int(g) < 8 :
+        cell = r + str(int(g)+1) + b
+        new_id = Litmus.cell[cell]['owner']['id']
+        new_litmus = Litmus.db[new_id]
+        adjacent.append({'id': new_id, 'case':'adjavent', 'litmus':new_litmus })
+    if int(b) > 1 :
+        cell = r + g + str(int(b)-1)
+        new_id = Litmus.cell[cell]['owner']['id']
+        new_litmus = Litmus.db[new_id]
+        adjacent.append({'id': new_id, 'case':'adjavent', 'litmus':new_litmus })
+    if int(b) < 8 :
+        cell = r + g + str(int(b)+1)
+        new_id = Litmus.cell[cell]['owner']['id']
+        new_litmus = Litmus.db[new_id]
+        adjacent.append({'id': new_id, 'case':'adjavent', 'litmus':new_litmus })
+    if adjacent :
+        thesaurus.update({'adjacent':{'count':len(adjacent), 'list':adjacent}})
+    
+    return thesaurus
+
+def find_nearest(rgb, radius) :
+    me = rgb
+    neighbor = 1.0
+    index = 0
+    for litmus in Litmus.db:
+        you = litmus['rgb']
+        d = tuple(abs(you[i] - me[i]) for i in range(0,3))
+        if d[0] < radius and d[1] < radius and d[2] < radius: 
+            distance = (d[0]**2 + d[1]**2+ d[2]**2)**0.5
+            if distance < neighbor :
+                neighbor = distance
+                index = litmus['id']
+    return index
+
 def is_hexa(tag):
     if len(tag) == 6:
         hexa = tag
@@ -109,19 +213,6 @@ def is_hexa(tag):
         return '#'+ hexa
     except ValueError:
         return False
-
-def is_tag(tag):
-    # tag 가 Litmus.giant 에 속하는지 검색
-    for star in Litmus.giant:
-        if tag == star['litmus']['name']:
-            return 'family'
-    """
-    # tag 가 Litmus.keyword 에 속하는지 검색
-    for word in Litmus.keyword:
-        if tag == word:
-            return 'keyword'
-    """
-    return ''
 
 def is_geo(word):
     if len(word.split(',')) == 2:

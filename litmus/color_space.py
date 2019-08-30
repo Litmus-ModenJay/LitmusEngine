@@ -2,17 +2,26 @@ import math
 
 # Color Vector Conversion & Classification
 class CVC():
+    """
+    @staticmethod
+    def supernova():
+        return [('Red','#FF0000'), ('Orange', '#FF7F00'), ('Yellow', '#FFFF00'), 
+            ('Green', '#00FF00'), ('Cyan', '#00FFFF'), ('Blue', '#0000FF'), 
+            ('Purple', '#800080'), ('Pink', '#FFC0CB'), ('Brown', '#964800'), 
+            ('White', '#FFFFFF'), ('Gray', '#808080'), ('Black', '#000000')]
+    """
+    
     @staticmethod
     def hexa_RGB(hexa):
         return tuple(int(hexa[2*i+1:2*i+3], 16) for i in range(0,3))
 
     @staticmethod
     def hexa_rgb(hexa):
-        return tuple(float(int(hexa[2*i+1:2*i+3], 16))/255.0 for i in range(0,3))
+        return tuple(float(int(hexa[2*i+1:2*i+3], 16))/255 for i in range(0,3))
     
     @staticmethod
     def RGB_rgb(RGB):
-        return tuple(float(RGB[i])/255.0 for i in range(0,3))
+        return tuple(float(RGB[i])/255 for i in range(0,3))
     
     @staticmethod
     def rgb_parameters(rgb):
@@ -120,11 +129,11 @@ class CVC():
             X = 0.4124564*r + 0.3575761*g + 0.1804375*b
             Y = 0.2126729*r + 0.7151522*g + 0.0721750*b
             Z = 0.0193339*r + 0.1191920*g + 0.9503041*b
-        elif profile == "Adobe RGB" :
+        elif profile == "AdobeRGB" :
             X = 0.5767309*r + 0.1855540*g + 0.1881852*b
             Y = 0.2973769*r + 0.6273491*g + 0.0752741*b
             Z = 0.0270343*r + 0.0706872*g + 0.9911085*b
-        elif profile == "CIE RGB" :
+        elif profile == "CIERGB" :
             X = 0.4887180*r + 0.3106803*g + 0.2006017*b
             Y = 0.1762044*r + 0.8129847*g + 0.0108109*b
             Z = 0.0000000*r + 0.0102048*g + 0.9897952*b
@@ -134,15 +143,17 @@ class CVC():
         else :
             x, y = X / sum, Y / sum
         return (X, Y, Z, sum/3, x, y)
+
     @staticmethod
     def XYZ_Labuv(XYZ, illuminant):
         X, Y, Z = XYZ[0], XYZ[1], XYZ[2]
-        if illuminant == "D50 2" :
+        if illuminant == "D50_2" :
             Xn, Yn, Zn = 0.966797, 1.0000, 0.825188
-        elif illuminant == "D65 2" :
+        elif illuminant == "D65_2" :
             Xn, Yn, Zn = 0.95047, 1.0000, 1.08883
         elif illuminant == "E" :
             Xn, Yn, Zn = 1.0000, 1.0000, 1.0000
+        
         xn, yn = Xn / (Xn + Yn + Zn), Yn / (Xn + Yn + Zn)
         un, vn = 4*xn / ((-2)*xn + 12*yn + 3), 9*yn / ((-2)*xn + 12*yn + 3)
         if X+Y+Z == 0:

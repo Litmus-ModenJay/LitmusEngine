@@ -40,7 +40,7 @@
         </div>
         <div class="col-sm-2" style="text-align:right">
             <p><a class="btn btn-info btn-sm border-light" style="background-color:indigo; width:110pt"
-                href="{% url 'litmus:colorSearch' %}">Color Search</a></p>
+                href="{% url 'litmus:main' %}">Color Search</a></p>
             <p></p>
         </div>
     </div>
@@ -139,11 +139,11 @@
                 },
                 icon: {
                     path: google.maps.SymbolPath.CIRCLE,
-                    scale : 4,
+                    scale : 6,
                     strokeWeight : 2,
                     fillColor: locations[i][4],
                     fillOpacity: 1.0,
-                    strokeColor: 'black',
+                    strokeColor: 'gray',
                     // anchor: new google.maps.Point(0, 0),
                     labelOrigin: new google.maps.Point(0, 2)
                 },

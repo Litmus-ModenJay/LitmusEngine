@@ -4,29 +4,25 @@
 
 {% block content %}
 
-<div class="container-fluid text-center" style="text-align:center; padding:100px">
+<div class="container-fluid text-center" style="text-align:center; padding:0px; padding-top:100px; padding-bottom:100px">
     <!-- Title -->
-    <img src="{% static 'icon/Color Studio-Litmus Project(title)-20190404.jpg' %}" style="width: 38%; height: auto;" alt="Search Colors"/>
+    <img src="{% static 'icon/Color Studio-Litmus Project(title)-20190404.jpg' %}" style="width: 320px; height: auto;" alt="Search Colors"/>
 
-    <!-- Login -->
+    <!-- Search with Color Picker-->
     <br><br><br><br>
-    
-    <form class="form-inline justify-content-center"  action="{% url 'litmus:main' %}" id="litmus_login" method="POST">
+    <form class="form-inline justify-content-center"  action="{% url 'litmus:main' %}" id="color_search" method="POST">
         {% csrf_token %}
+        
         <div class="form-group" >
-            <input type="password"  name="login" id="login_input" class="form-control input-group colorpicker-component" style="text-align:left" placeholder="Enter Password">
-            <button type="submit" name="submit" class="btn btn-Warning"><i class="fas fa-search"></i></button>   
-        </div>
+            <div style="display: inline-block">
+                <input type="text"  name="search" id="search_input" class="form-control input-group colorpicker-component" style="width: 200px; height: auto; text-align:left" placeholder="color name or code">
+                <button type="submit" name="submit" class="btn btn-Warning"><i class="fas fa-search"></i></button>   
+            </div>
+        </div>  
     </form>
-    <!--
-    <div style="text-align:center">
-        <p><a class="btn btn-info btn-sm" style="background-color:royalblue; width:110pt" 
-            href="{% url 'litmus:msAuth' %}">Login</a></p>
-    </div>
-    -->
 </div>
 
-<div class="container-fluid text-center" style="text-align:center; padding:30px">
+<div class="container-fluid text-center" style="text-align:center; padding:50px">
 </div>
 
 {% endblock %}

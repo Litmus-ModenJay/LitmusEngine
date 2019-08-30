@@ -5,8 +5,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" >
-  <meta name="google-site-verification" content="CWfTKYkg79E5dSQOuxLR9Z457BcAVhSOThqm9upwj8U" />
-
   <title>Litmus</title>
   
   <!-- Bootstrap CSS -->
@@ -44,18 +42,8 @@
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color:black; padding: 0px">
     <div class="container body-content">
       <a class="navbar-brand" href="{% url 'litmus:main' %}">
-        <img src="{% static 'icon/Color Studio-Litmus Project(navi)-20190404.jpg' %}" style="width: 80%; height: auto;" alt="ModenJay Color Studio"/></a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <!--
-      {% if login.status == 'logout' %}
-      <a style="color:orange; padding-top: 8px; font-size: 16px" href="{{login.urls.login}}" >Login</a>  
-      {% else %}
-      <a style="color:deepskyblue; padding-top: 8px; font-size: 16px" href="{{login.urls.logout}}" >{{login.user}}</a>  
-      {% endif %}
-      -->
-      <img src="{% static 'icon/Color Studio-Litmus Project(logo)-20190404.jpg' %}" style="width: 15%; height: auto;" alt="McScience"/>
+      <img src="{% static 'icon/Color Studio-Litmus Project(navi)-20190801.jpg' %}" style="width: 300px; height: auto;" alt="ModenJay Color Studio"/></a>
+      <img src="{% static 'icon/Color Studio-Litmus Project(logo)-20190404.jpg' %}" style="width: 120px; height: auto;" alt="McScience"/>
     </div>
   </nav>
    
@@ -63,8 +51,8 @@
       {% block content %}{% endblock %}
       <hr />
       <footer>
-        <div class="jumbotron" style="background-color:rgb(226, 226, 226); padding:10px">
-            <b>&copy; ModenJay<sup>&reg</sup> Color Studio - Litmus Project</b>
+        <div class="jumbotron" style="background-color:rgb(226, 226, 226); padding:5px; padding-left:10px">
+          <b style="font-size:9pt">&copy; ModenJay<sup>&reg</sup> Color Studio - Litmus Project</b>
         </div>
       </footer>
   </div>
