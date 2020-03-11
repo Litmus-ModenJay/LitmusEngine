@@ -151,11 +151,11 @@ class Litmus():
             elif hue >= 273.43 :
                 H_name = 'Blue'
             elif hue >= 218.32 :
-                H_name = 'Sky Blue'
+                H_name = 'Sky'
             elif hue >= 175.76 :
                 H_name = 'Cyan'
             elif hue >= 145.73 :
-                H_name = 'Aquamarine'
+                H_name = 'Sea'
             elif hue >= 122.42 :
                 H_name = 'Green'
             elif hue >= 105.84 :
